@@ -13,12 +13,11 @@ def jaccard_distance(a,b):
 	union_len = float(len(list(a.union(b))))
 	return inter_len/union_len
 
-df = pd.read_csv('test.csv')
-print df.head()
+df = pd.read_csv('/home/arpit/learning/machine learning/dataset/test.csv')
 # print df.tail(),df.shape[0],df.shape[1]
 #check for null element
 
-print df.isnull().any().count()
+print df.isnull().any()
 # df1 = pd.DataFrame()
 # # df1['qid'] = df['qid1']
 # df1['questions']= df['question1']
@@ -30,7 +29,8 @@ print df.isnull().any().count()
 # df = pd.concat(frame)
 # print df.tail(),df.shape[0]
 #drop null values
-df=df.dropna()
+df=df.fillna('_')
+print df.isnull().any().count()
 # string_sim = string_sim.toarray()
 
 string_sim = df.as_matrix()
@@ -49,10 +49,9 @@ for o in string_sim:
 	count = count +1
 	string.append(str(o[1]))
 	string.append(str(o[2]))
-	# ngram_array = [ list(n.split(s)) for s in string]
-	# jaccard_distance_ans = [jaccard_distance(NGram(ngram_array[0]),NGram(s)) for s in ngram_array][1]
+	ngram_array = [ list(n.split(s)) for s in string]
+	jaccard_distance_ans = [jaccard_distance(NGram(ngram_array[0]),NGram(s)) for s in ngram_array][1]
 	# print string
-	jaccard_distance_ans =0
 	if (count == 10000):
 		print 10000
 		print  datetime.datetime.now()
@@ -75,16 +74,3 @@ for o in string_sim:
 df1 = pd.DataFrame(data = duplicated, columns=['test_id','is_duplicate'])
 print df1.head()
 df1.to_csv('result.csv', sep=',', header=True, index=False)
-#applying cosine similarity
-# sim_arry1 = cosine_similarity(y_array)
-# # print sim_arry1[:3]
-# l=-1
-# for i in sim_arry1:
-# 	k=-1
-# 	l=l+1
-# 	for j in i:
-# 		k=k+1
-# 		if(j>0.8):
-# 			if(string_sim[l]!=string_sim[k]):
-# 				print j,string_sim[l],string_sim[k]
-

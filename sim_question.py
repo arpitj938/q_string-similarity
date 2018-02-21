@@ -82,7 +82,7 @@ def cosine_sim(string):
 # str_input = raw_input('Enter the string')
 df = pd.read_csv('/home/arpit/learning/machine learning/quora_dataset/test.csv')
 # print df.head()
-print df.is_duplicate.unique()
+# print df.is_duplicate.unique()
 # a= input()
 create_csv()
 df=df.fillna('_')

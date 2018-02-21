@@ -10,9 +10,13 @@ from nltk.corpus import stopwords
 import re
 import nltk
 from nltk.stem import WordNetLemmatizer
+import sys  
+
+reload(sys)  
+sys.setdefaultencoding('utf8')
 
 lemmatizer = WordNetLemmatizer()
-
+fail =0
 stops = set(stopwords.words("english"))                 
 print stops
 def save_csv(data):
@@ -39,6 +43,8 @@ def tokernize_removestop(a):
 		c.append(lemmatizer.lemmatize(w))
 	a =  c
 	a = [w for w in a if not w in stops]
+	if(len(a)==0):
+		a=c
 	# print "token",a
 	return a
 	
@@ -46,6 +52,7 @@ def add_pos_tag(a):
 	return nltk.pos_tag(a)
 
 def jaccard_distance(a,b):
+	global fail
 	# print a, b
 	a = tokernize_removestop(a)
 	b = tokernize_removestop(b)
@@ -58,6 +65,7 @@ def jaccard_distance(a,b):
 		union_len = float(len(list(a.union(b))))
 		return inter_len/union_len
 	except Exception,e:
+		fail = fail+1
 		print e
 		print a,b
 		return 0
@@ -80,7 +88,7 @@ def cosine_sim(string):
 # print cosine_sim(string)
 # tokernize(unicode(string[0]),unicode(string[1]))
 # str_input = raw_input('Enter the string')
-df = pd.read_csv('/home/arpit/learning/machine learning/quora_dataset/test.csv')
+df = pd.read_csv('/home/arpit/learning/machine learning/quora_dataset/train.csv')
 # print df.head()
 # print df.is_duplicate.unique()
 # a= input()
@@ -97,10 +105,10 @@ count = 0
 i=1
 print  datetime.datetime.now()
 start =  datetime.datetime.now()
-for o in string_sim[10:30]:
+for o in string_sim:
 	string = []
-	string.append(str(o[1]))
-	string.append(str(o[2]))
+	string.append(str(o[3]))
+	string.append(str(o[4]))
 	# print "string",string
 	jaccard_distance_ans = jaccard_distance(string[0].decode('utf-8'),string[1].decode('utf-8'))
 	# q = input()
@@ -126,7 +134,8 @@ for o in string_sim[10:30]:
 		ans[1] = jaccard_distance_ans
 		ans[2] = jaccard_distance_ans
 		print e
-		print o[1],o[2]
+		fail = fail+1
+		print o[3],o[4]
 	count = count +1
 	if (ans[2]>=0.75):
 		result = 1
@@ -137,3 +146,4 @@ for o in string_sim[10:30]:
 	# print o[4]
 	# print ans[0],ans[1],result , o[5]	
 save_csv(duplicated)
+print "fail", fail

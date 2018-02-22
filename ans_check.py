@@ -7,7 +7,10 @@ orginal = df1.shape[0]
 result = df.shape[0]
 print orginal
 print result
-
-orginal_ans = df1['is_duplicate'].value_counts()[1]
-result_ans = df['is_duplicate'].value_counts()[1]
-print "percentage", ((float(orginal_ans) - float(result_ans))/float(orginal_ans))*100
+df = df.as_matrix()
+df1 = df1.as_matrix()
+count =0
+for o in xrange(1,len(df)):
+	if(df[o][1]==df1[o][5]):
+		count = count+1
+print "percentage", ((float(len(df)) - float(count))/float(len(df)))*100

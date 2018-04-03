@@ -126,8 +126,12 @@ def cosine_sim(string):
 # print cosine_sim(string)
 
 df = pd.read_csv('/home/arpit/learning/machine learning/quora_dataset/train.csv')
-# print df.head()
-# print df.is_duplicate.unique()
+print df.shape
+# df  = df.iloc[:2000,:]
+# print df.shape
+df = df.iloc[:2000,:]
+print df.head()
+print df.is_duplicate.unique()
 # a= input()
 create_csv()
 df=df.fillna('_')
@@ -138,7 +142,9 @@ print string_sim[0][1]
 duplicated = {}
 duplicated['test_id'] = []
 duplicated['is_duplicate'] = []
-
+data = {}
+data["jacc"] = []
+data["cosine"] = []
 # #Testing Purpose Init
 # o_duplicated = {}
 # o_duplicated['cosine_count'] = []
@@ -150,12 +156,13 @@ count = 0
 i=1
 print  datetime.datetime.now()
 start =  datetime.datetime.now()
-for o in string_sim[:20000]:
+for o in string_sim:
 	string = []
 	string.append(str(o[3]))
 	string.append(str(o[4]))
 	# print "string",string
 	jaccard_distance_ans = jaccard_distance(string[0].decode('utf-8'),string[1].decode('utf-8'))
+	data["jacc"].append(jaccard_distance_ans)
 	# q = input()
 	if (count == 10000):
 		print i*10000
@@ -181,6 +188,7 @@ for o in string_sim[:20000]:
 		print e
 		fail = fail+1
 		print o[3],o[4]
+	data["cosine"].append(ans[0])
 	count = count +1
 	if(o[5]==1.0):
 		# #postive count
@@ -189,11 +197,11 @@ for o in string_sim[:20000]:
 		avg_c = avg_c + 1
 		jaccard_distance_avg.append(ans[1])
 		cosine_sim_avg.append(ans[0])
-	else:
-		# # negative count
-		# o_duplicated['cosine_count'].append(ans[0])
-		# o_duplicated['jaccard_count'].append(ans[1])
-	if (ans[2]>=0.9):
+	# else:
+	# 	# # negative count
+	# 	# o_duplicated['cosine_count'].append(ans[0])
+	# 	# o_duplicated['jaccard_count'].append(ans[1])
+	if(ans[2]>=0.9):
 		result = 1
 		one_count = one_count + 1
 	else:
@@ -205,6 +213,28 @@ for o in string_sim[:20000]:
 save_csv(duplicated)
 
 # #For Checking Purpose
+
+from sklearn.preprocessing import scale
+y = df.iloc[:,-1:]
+print y.head()
+X = pd.DataFrame(data=data,columns=["jacc","cosine"])
+print X.head()
+# X = scale(X)
+print X.shape
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 200)
+
+import xgboost as xgb   
+# fit model no training data
+gbm = xgb.XGBClassifier(max_depth=7, n_estimators=700, learning_rate=0.05).fit(X_train, y_train)
+y_pred = gbm.predict(X_test)
+# Confution matrix and ac5.
+from sklearn.metrics import confusion_matrix,accuracy_score
+cm = confusion_matrix(y_test, y_pred)
+print(accuracy_score(y_test, y_pred))
+print("xgboost: confusion_matrix")
+print(cm)
+
 
 
 # df2 = pd.DataFrame(data=o_duplicated,columns=['jaccard_count','cosine_count'])
